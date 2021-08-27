@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    
+    <title>Backdoor: Poker Game Organizer </title>
+</head>
+
+<body>
+    <div class="container">
+        <ul class="nav nav-pills my-3">
+            <li class="nav-item">
+              <a class="nav-link" href="/main">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/main/create">Host a Game</a>
+              </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/logout">Log Out</a>
+              </li>
+          </ul>
+        <div class="row">
+            <h2 class="display-2">{{game.title}}</h2>
+            {% if user in game.players.all and game.host_id != user %}
+            <form action="/main/{{game.id}}/leave" method="post">
+                {% csrf_token %}
+                <button type="submit" class="rounded btn btn-secondary btn-sm m-1">Leave</button>
+            </form>
+            {% endif %}
+            
+            {% if user not in game.players.all %}
+            <form action="/main/{{game.id}}/join" method="post">
+                {% csrf_token %}
+                <button type="submit" class="rounded btn btn-primary btn-sm m-1">Join</button>
+            </form>
+            {% endif %}
+            {% if game.host_id == user %}
+            <form action="/main/{{game.id}}/delete" method="post">
+                {% csrf_token %}
+                <button type="submit" class="rounded btn btn-danger btn-sm m-1">Cancel game</button>
+            </form>
+            {% endif %}
+            <div class="game col m-1">
+                <p class="h3">Game Details</p>
+                <p>Hosted by: {{game.host_id.first_name}} {{game.host_id.last_name}}</p>
+                <p>{{game.date}}</p>
+                <p>{{game.type}}</p>
+                <p>Buy-in: ${{game.buyIn}} | Blinds: {{game.blinds}}</p>
+                <p>{{game.numberOfPlayers}} spots</p>
+                <p>Home Rules: {{game.desc}}</p>
+            </div>
+            <div class="players col m-1">
+                <h2>Players:</h2>
+                {% for player in players %}
+                <p>{{player.first_name}} {{player.last_name}}</p>
+                {% endfor %}
+            </div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+</body>
+</html>
